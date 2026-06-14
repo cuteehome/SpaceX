@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酷E家智能家居 | 智能安防与家居控制</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top, rgba(0, 212, 255, 0.08), transparent 32%),
+                        radial-gradient(circle at bottom right, rgba(0, 255, 136, 0.08), transparent 28%),
+                        #05070f;
+            color: #f4f7ff;
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 7, 15, 0.86);
+            backdrop-filter: blur(14px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: #00d4ff;
+            text-transform: uppercase;
+        }
+        nav ul {
+            display: flex;
+            align-items: center;
+            gap: 1.8rem;
+            list-style: none;
+        }
+        nav a {
+            color: #e8eef7;
+            text-decoration: none;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color 0.25s ease;
+        }
+        nav a:hover,
+        nav a.active {
+            color: #00d4ff;
+        }
+        nav a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: width 0.25s ease;
+        }
+        nav a:hover::after,
+        nav a.active::after {
+            width: 100%;
+        }
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 2rem 3rem;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(5, 7, 15, 0.82), rgba(5, 7, 15, 0.58)),
+                        url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+        }
+        .hero::before,
+        .hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+        }
+        .hero::before {
+            width: 420px;
+            height: 420px;
+            background: rgba(0, 212, 255, 0.16);
+            top: 20%;
+            right: -120px;
+        }
+        .hero::after {
+            width: 320px;
+            height: 320px;
+            background: rgba(0, 255, 136, 0.14);
+            bottom: 10%;
+            left: -100px;
+        }
+        .hero-content {
+            max-width: 760px;
+            z-index: 1;
+        }
+        .hero-title {
+            font-size: clamp(2.4rem, 4.8vw, 4rem);
+            line-height: 1.05;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #00d4ff 0%, #00ffa0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #cbd4ee;
+            margin-bottom: 2rem;
+            max-width: 680px;
+        }
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .button.primary {
+            background: linear-gradient(135deg, #00d4ff, #00ffa0);
+            color: #06121f;
+        }
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e8eef7;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px rgba(0, 212, 255, 0.16);
+        }
+        .info-panel {
+            margin-top: 3rem;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.2rem;
+        }
+        .stat {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 1.5rem 1.4rem;
+        }
+        .stat strong {
+            display: block;
+            font-size: 1.8rem;
+            color: #00d4ff;
+            margin-bottom: 0.6rem;
+        }
+        .stat span {
+            color: #b8c2e0;
+            font-size: 0.96rem;
+        }
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+        .section-title {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #00d4ff, #00ffa0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.04em;
+        }
+        .section-subtitle {
+            color: #aac0e5;
+            max-width: 760px;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            background: center/cover no-repeat;
+            opacity: 0.35;
+            z-index: 0;
+            transition: opacity 0.25s ease;
+        }
+        .card > * {
+            position: relative;
+            z-index: 1;
+        }
+        .card:hover::before {
+            opacity: 0.5;
+        }
+        .card-img {
+            width: 100%;
+            height: 170px;
+            border-radius: 18px;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 1.2rem;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
+        .card-image {
+            width: 100%;
+            height: 170px;
+            border-radius: 18px;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 1.2rem;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 60px rgba(0, 212, 255, 0.12);
+            border-color: rgba(0, 212, 255, 0.24);
+        }
+        .card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            color: #e8f5ff;
+        }
+        .card p {
+            color: #b8c2e0;
+            line-height: 1.8;
+        }
+        .card .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.92rem;
+            color: #00ff94;
+        }
+        .feature-list {
+            display: grid;
+            gap: 1rem;
+        }
+        .feature-item {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .feature-item span {
+            width: 2.4rem;
+            height: 2.4rem;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: rgba(0, 212, 255, 0.14);
+            color: #00d4ff;
+            font-size: 1.1rem;
+        }
+        .feature-item div p {
+            color: #d8dff4;
+            line-height: 1.7;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .gallery-card {
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            min-height: 220px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.55)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+        }
+        .gallery-card::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .gallery-card:nth-child(2) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(3) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(4) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(5) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(6) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(7) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(8) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(9) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(10) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=800&q=80'); }
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .contact-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 2rem;
+        }
+        .contact-card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .contact-card p {
+            color: #b8c2e0;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        .contact-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 22px;
+            border: 1px solid rgba(255,255,255,0.10);
+            display: block;
+            margin-bottom: 1.5rem;
+        }
+        .qr-codes {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .qr-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .qr-codes img {
+            margin-bottom: 0;
+        }
+        .qr-label {
+            font-size: 0.9rem;
+            color: #00d4ff;
+            font-weight: 500;
+        }
+        .contact-form {
+            display: grid;
+            gap: 1rem;
+        }
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 1rem 1.1rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #eef2ff;
+            font-size: 0.98rem;
+            outline: none;
+        }
+        .contact-form textarea {
+            min-height: 160px;
+            resize: vertical;
+        }
+        .contact-form button {
+            width: fit-content;
+            padding: 1rem 1.8rem;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #00d4ff, #00ffa0);
+            color: #06121f;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .contact-form button:hover {
+            transform: translateY(-2px);
+        }
+        footer {
+            padding: 2rem;
+            text-align: center;
+            color: #7e8cae;
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        @media (max-width: 980px) {
+            .hero {
+                padding-top: 140px;
+            }
+            .info-panel {
+                grid-template-columns: 1fr;
+            }
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 760px) {
+            nav {
+                padding: 1rem 1rem;
+            }
+            nav ul {
+                display: none;
+            }
+            .hero-content {
+                text-align: center;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .section {
+                padding: 4.5rem 1rem;
+            }
+            .gallery {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 560px) {
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            .hero-title {
+                font-size: 2.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">酷E家</div>
+        <ul>
+            <li><a href="#intro" class="active">简介</a></li>
+            <li><a href="#lighting">智能照明</a></li>
+            <li><a href="#lock">智能安防</a></li>
+            <li><a href="#home">家居生态</a></li>
+            <li><a href="#contact">联系我们</a></li>
+        </ul>
+    </nav>
+    <section class="hero" id="intro">
+        <div class="hero-content">
+            <h1 class="hero-title">智取未来，守护每一个家</h1>
+            <p class="hero-subtitle">酷E家智能家居，源自深圳，服务粤港澳大湾区。我们专注智能安防、智能照明、家居生态与全屋联动，让你的居家生活更安全、更舒适、更智慧。</p>
+            <div class="hero-actions">
+                <a href="#lighting" class="button primary">了解智能照明</a>
+                <a href="#contact" class="button secondary">立即联系我们</a>
+            </div>
+            <div class="info-panel">
+                <div class="stat">
+                    <strong>10+</strong>
+                    <span>年智能家居研发经验</span>
+                </div>
+                <div class="stat">
+                    <strong>100+</strong>
+                    <span>专业产品与传感器支持</span>
+                </div>
+                <div class="stat">
+                    <strong>24/7</strong>
+                    <span>云端服务与售后支持</span>
+                </div>
+                <div class="stat">
+                    <strong>深港生态</strong>
+                    <span>粤港澳大湾区智能系统布局</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="lighting">
+        <h2 class="section-title">智能照明</h2>
+        <p class="section-subtitle">酷e家智能照明支持传统墙壁开关、手机应用、语音操控与自动场景，开门自动亮灯、离家自动熄灯，定时任务与分组联动，免布线设计更省时省力。</p>
+        <div class="cards-grid">
+            <div class="card">
+                <img class="card-img" src="img_switch.jpg" alt="智能开关">
+                <div class="tag">智能开关</div>
+                <h3>全屋智能开关</h3>
+                <p>支持墙壁开关、遥控开关与App控制，多种安装方式适配不同空间。</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="img_dimmer.jpg" alt="调光灯具">
+                <div class="tag">调光灯具</div>
+                <h3>柔光调节与氛围照明</h3>
+                <p>支持亮度与色温调节，打造日夜场景，为居家空间带来更贴心的人文体验。</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="img_sensor.jpg" alt="智能感知">
+                <div class="tag">智能感知</div>
+                <h3>环境与动作感知</h3>
+                <p>基于人体与环境传感，自动触发灯光和场景，提升居家安全与生活便捷度。</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="img_phone.jpg" alt="便捷控制">
+                <div class="tag">便捷控制</div>
+                <h3>多种灯控方式</h3>
+                <p>支持传统开关、遥控器、手机App和语音控制，兼容主流智能生态，让你随时随地掌控家中照明。</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="img_scene.jpg" alt="场景联动">
+                <div class="tag">场景联动</div>
+                <h3>智能场景自动触发</h3>
+                <p>进门亮灯、离家灭灯、夜间柔光等场景轻松配置，自动化规则让生活更安心、更舒适。</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="img_install.jpg" alt="省时安装">
+                <div class="tag">省时安装</div>
+                <h3>免布线更省力</h3>
+                <p>兼容旧墙壁开关，支持无线布局，安装更简单，适合新房改造和旧屋升级。</p>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="lock">
+        <h2 class="section-title">智能安防</h2>
+        <p class="section-subtitle">酷e家智能安防覆盖门锁、智能监控与环境安全，构建主动防护体系，为家庭提供全天候的安全守护。</p>
+        <div class="cards-grid">
+            <div class="card">
+                <img class="card-image" src="img_lock.png" alt="智能门锁">
+                <div class="tag">智能门禁</div>
+                <h3>人脸识别门禁系统</h3>
+                <p>支持3D人脸识别、指纹、密码和蓝牙开锁，多重认证结合防撬设计，守护家庭安全出入口。</p>
+            </div>
+            <div class="card">
+                <img class="card-image" src="img_cctv.png" alt="监控摄像机看护院子">
+                <div class="tag">智能监控</div>
+                    <h3>摄像机与录像系统</h3>
+                <p>覆盖式智能摄像机与录像机系统，支持夜视、移动侦测与远程回放，实时保护家中动静。</p>
+            </div>
+            <div class="card">
+                <img class="card-image" src="img_smoke.png" alt="环境安全检测">
+                <div class="tag">环境安全</div>
+                <h3>烟雾、燃气与火灾检测</h3>
+                <p>集成主动安全探测，及时预警烟雾、燃气和火灾隐患，打造安心居家环境。</p>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="home">
+        <h2 class="section-title">家居生态</h2>
+        <p class="section-subtitle">构建全屋智能生态，涵盖灯光、窗帘、家电、安防、门禁、环境监控、影音控制与语音交互。酷e家让每一个空间都成为智慧生活中心。</p>
+        <div class="gallery">
+            <div class="gallery-card" data-label="灯光控制"></div>
+            <div class="gallery-card" data-label="窗帘控制"></div>
+            <div class="gallery-card" data-label="家电控制"></div>
+            <div class="gallery-card" data-label="安防监控"></div>
+            <div class="gallery-card" data-label="智能门禁"></div>
+            <div class="gallery-card" data-label="环境监控"></div>
+            <div class="gallery-card" data-label="影音控制"></div>
+            <div class="gallery-card" data-label="语音控制"></div>
+            <div class="gallery-card" data-label="智能交互"></div>
+            <div class="gallery-card" data-label="能耗安全"></div>
+        </div>
+    </section>
+    <section class="section" id="contact">
+        <h2 class="section-title">联系我们</h2>
+        <p class="section-subtitle">欢迎关注微信或WhatsApp并发送留言，我们将为您提供智能家居方案咨询、产品选型与技术支持。</p>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h3>联系酷e家</h3>
+                <div class="qr-codes">
+                    <div class="qr-item">
+                        <img src="img_whatsapp_qr.jpg" alt="WhatsApp二维码">
+                        <span class="qr-label">WhatsApp</span>
+                    </div>
+                    <div class="qr-item">
+                        <img src="img_wechat_qr.jpg" alt="微信二维码">
+                        <span class="qr-label">WeChat</span>
+                    </div>
+                </div>
+                <p>关注微信或WhatsApp获取最新产品和服务。您也可以填写下方表单，让我们的顾问在24小时内与您联系。</p>
+                <p>联系Email：mars&nbsp;@&nbsp;cuteehome.com</p>
+                </p>
+                <p>服务范围：智能安防、智能家居、智能灯控、智能门锁。</p>
+            </div>
+            <form class="contact-form">
+                <input type="text" placeholder="称呼" required>
+                <input type="email" placeholder="Email" required>
+                <textarea placeholder="留言" required></textarea>
+                <button type="submit">提交</button>
+            </form>
+        </div>
+    </section>
+    <footer>
+        © 2026 酷e家智能家居。保留所有权利。
+    </footer>
+</body>
+</html>
