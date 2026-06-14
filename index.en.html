@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CuteeHome Smart Home | Security & Home Control</title>
+    <style>
+        /* Keep same styles as Chinese page for consistency */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top, rgba(0, 212, 255, 0.08), transparent 32%),
+                        radial-gradient(circle at bottom right, rgba(0, 255, 136, 0.08), transparent 28%),
+                        #05070f;
+            color: #f4f7ff;
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+        nav { position: fixed; top: 0; left: 0; width: 100%; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; background: rgba(5,7,15,0.86); backdrop-filter: blur(14px); z-index:100; border-bottom:1px solid rgba(255,255,255,0.08); }
+        .logo { font-size:1.7rem; font-weight:900; letter-spacing:0.2em; color:#00d4ff; text-transform:uppercase; }
+        nav ul { display:flex; align-items:center; gap:1.8rem; list-style:none; }
+        nav a { color:#e8eef7; text-decoration:none; font-size:0.95rem; position:relative; transition: color 0.25s ease; }
+        nav a:hover, nav a.active { color:#00d4ff; }
+        .lang-switch a { color:#e8eef7; text-decoration:none; font-weight:700; }
+        /* Rest of styles copied from index.html to keep layout identical */
+        .hero { min-height:100vh; display:flex; align-items:center; padding:120px 2rem 3rem; position:relative; overflow:hidden; background: linear-gradient(180deg, rgba(5,7,15,0.82), rgba(5,7,15,0.58)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat; }
+        .hero::before, .hero::after { content:''; position:absolute; border-radius:50%; filter:blur(80px); opacity:0.6; }
+        .hero::before { width:420px; height:420px; background: rgba(0,212,255,0.16); top:20%; right:-120px; }
+        .hero::after { width:320px; height:320px; background: rgba(0,255,136,0.14); bottom:10%; left:-100px; }
+        .hero-content { max-width:760px; z-index:1; }
+        .hero-title { font-size:clamp(2.4rem,4.8vw,4rem); line-height:1.05; margin-bottom:1rem; letter-spacing:-0.04em; background:linear-gradient(135deg,#00d4ff 0%,#00ffa0 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .hero-subtitle { font-size:1.2rem; color:#cbd4ee; margin-bottom:2rem; max-width:680px; }
+        .hero-actions { display:flex; flex-wrap:wrap; gap:1rem; }
+        .button { display:inline-flex; align-items:center; justify-content:center; padding:1rem 2rem; border-radius:999px; font-weight:700; text-decoration:none; cursor:pointer; }
+        .button.primary { background:linear-gradient(135deg,#00d4ff,#00ffa0); color:#06121f; }
+        .button.secondary { background:rgba(255,255,255,0.06); color:#e8eef7; border:1px solid rgba(255,255,255,0.12); }
+        .info-panel { margin-top:3rem; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:1.2rem; }
+        .stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:1.5rem 1.4rem; }
+        .stat strong { display:block; font-size:1.8rem; color:#00d4ff; margin-bottom:0.6rem; }
+        .section { max-width:1200px; margin:0 auto; padding:6rem 2rem; }
+        .section-title { font-size:2.8rem; margin-bottom:1rem; background:linear-gradient(135deg,#00d4ff,#00ffa0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .cards-grid { display:grid; grid-template-columns:repeat(3, minmax(260px,1fr)); gap:1.5rem; }
+        .card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:2rem; overflow:hidden; position:relative; }
+        .card-img, .card-image { width:100%; height:170px; border-radius:18px; object-fit:cover; display:block; margin-bottom:1.2rem; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
+        .tag { color:#00ff94; display:inline-flex; align-items:center; gap:0.5rem; margin-bottom:1rem; }
+        .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; }
+        .gallery-card {
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            min-height: 220px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.55)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+        }
+        .gallery-card::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .gallery-card:nth-child(2) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(3) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(4) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(5) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(6) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(7) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(8) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(9) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1496307653780-42ee777d4833?auto=format&fit=crop&w=800&q=80'); }
+        .gallery-card:nth-child(10) { background-image: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1520880867055-1e30d1cb001c?auto=format&fit=crop&w=800&q=80'); }
+
+        .qr-codes {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .qr-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .qr-codes img {
+            margin-bottom: 0;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.10);
+        }
+        .qr-label {
+            font-size: 0.9rem;
+            color: #00d4ff;
+            font-weight: 500;
+        }
+
+        .contact-form {
+            display: grid;
+            gap: 1rem;
+        }
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 1rem 1.1rem;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #eef2ff;
+            font-size: 0.98rem;
+            outline: none;
+        }
+        .contact-form textarea { min-height: 160px; resize: vertical; }
+        .contact-form button {
+            width: fit-content;
+            padding: 1rem 1.8rem;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #00d4ff, #00ffa0);
+            color: #06121f;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .contact-form button:hover { transform: translateY(-2px); }
+        .contact-grid { display:grid; grid-template-columns:1.1fr 0.9fr; gap:2rem; margin-top:2rem; }
+        .contact-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:2rem; }
+        .contact-card img { width:120px; height:120px; object-fit:cover; border-radius:22px; border:1px solid rgba(255,255,255,0.10); display:block; margin-bottom:1.5rem; }
+        footer { padding:2rem; text-align:center; color:#7e8cae; font-size:0.95rem; border-top:1px solid rgba(255,255,255,0.08); }
+        @media (max-width:980px) { .hero { padding-top:140px; } .info-panel { grid-template-columns:1fr; } .contact-grid { grid-template-columns:1fr; } }
+        @media (max-width:760px) { nav { padding:1rem 1rem; } nav ul { display:none; } .hero-content { text-align:center; } .hero-actions { justify-content:center; } .section { padding:4.5rem 1rem; } .gallery { grid-template-columns:1fr 1fr; } }
+        @media (max-width:560px) { .gallery { grid-template-columns:1fr; } .hero-title { font-size:2.6rem; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">CuteeHome</div>
+        <ul>
+            <li><a href="#intro" class="active">Introduction</a></li>
+            <li><a href="#lighting">Lighting</a></li>
+            <li><a href="#lock">Security</a></li>
+            <li><a href="#home">Ecosystem</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="lang-switch"><a href="index.html">中文</a></div>
+    </nav>
+    <section class="hero" id="intro">
+        <div class="hero-content">
+            <h1 class="hero-title">Smart living, secured for every home</h1>
+            <p class="hero-subtitle">CuteeHome smart home solutions from Shenzhen, serving the Greater Bay Area. We focus on smart security, lighting, and whole-home automation to make living safer and more comfortable.</p>
+            <div class="hero-actions">
+                <a href="#lighting" class="button primary">Explore Lighting</a>
+                <a href="#contact" class="button secondary">Contact Us</a>
+            </div>
+            <div class="info-panel">
+                <div class="stat"><strong>10+</strong><span>Years of smart home R&D</span></div>
+                <div class="stat"><strong>100+</strong><span>Products & sensors supported</span></div>
+                <div class="stat"><strong>24/7</strong><span>Cloud services & support</span></div>
+                <div class="stat"><strong>Regional</strong><span>Greater Bay Area deployment</span></div>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="lighting">
+        <h2 class="section-title">Smart Lighting</h2>
+        <p class="section-subtitle">Supports wall switches, mobile apps, voice control and automation. Auto on/off, scheduling, and grouping make lighting effortless without rewiring.</p>
+        <div class="cards-grid">
+            <div class="card">
+                <img class="card-img" src="resources/img_switch.jpg" alt="Smart switch">
+                <div class="tag">Switch</div>
+                <h3>Whole-home smart switches</h3>
+                <p>Supports wall switches, remote controls and app control with multiple installation options.</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="resources/img_dimmer.jpg" alt="Dimmable lights">
+                <div class="tag">Dimming</div>
+                <h3>Dimmable & ambient lighting</h3>
+                <p>Brightness and color temperature control to create day/night scenes and cozy atmospheres.</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="resources/img_sensor.jpg" alt="Sensing">
+                <div class="tag">Sensing</div>
+                <h3>Environmental & motion sensing</h3>
+                <p>Automatically trigger lights and scenes based on presence and environment.</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="resources/img_phone.jpg" alt="Mobile control">
+                <div class="tag">Control</div>
+                <h3>Multiple control methods</h3>
+                <p>Supports wall switches, remotes, mobile apps and voice assistants for seamless control.</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="resources/img_scene.jpg" alt="Scenes">
+                <div class="tag">Scenes</div>
+                <h3>Automated scenes</h3>
+                <p>Entry lights, away-off, and night soft-light scenes are easy to configure.</p>
+            </div>
+            <div class="card">
+                <img class="card-img" src="resources/img_install.jpg" alt="Easy installation">
+                <div class="tag">Installation</div>
+                <h3>Minimal rewiring</h3>
+                <p>Compatible with existing switches and supports wireless layouts for fast upgrades.</p>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="lock">
+        <h2 class="section-title">Smart Security</h2>
+        <p class="section-subtitle">Coverage for locks, cameras and environment monitoring to build proactive protection for your home.</p>
+        <div class="cards-grid">
+            <div class="card">
+                <img class="card-image" src="resources/img_lock.png" alt="Smart lock">
+                <div class="tag">Access</div>
+                <h3>Face recognition & multi-auth</h3>
+                <p>3D face, fingerprint, PIN and Bluetooth unlock methods with anti-tamper design.</p>
+            </div>
+            <div class="card">
+                <img class="card-image" src="resources/img_cctv.png" alt="CCTV">
+                <div class="tag">Cameras</div>
+                <h3>Cameras & recording</h3>
+                <p>Wide coverage cameras with night vision, motion detection and remote playback.</p>
+            </div>
+            <div class="card">
+                <img class="card-image" src="resources/img_smoke.png" alt="Safety detectors">
+                <div class="tag">Safety</div>
+                <h3>Smoke, gas & fire detection</h3>
+                <p>Integrated sensors provide timely alerts for potential hazards.</p>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="home">
+        <h2 class="section-title">Home Ecosystem</h2>
+        <p class="section-subtitle">Build a full-home ecosystem covering lighting, curtains, appliances, security, environment monitoring and voice control.</p>
+        <div class="gallery">
+            <div class="gallery-card" data-label="Lighting"></div>
+            <div class="gallery-card" data-label="Curtains"></div>
+            <div class="gallery-card" data-label="Appliances"></div>
+            <div class="gallery-card" data-label="Security"></div>
+            <div class="gallery-card" data-label="Access"></div>
+            <div class="gallery-card" data-label="Environment"></div>
+            <div class="gallery-card" data-label="AV"></div>
+            <div class="gallery-card" data-label="Voice"></div>
+            <div class="gallery-card" data-label="Interaction"></div>
+            <div class="gallery-card" data-label="Energy & Safety"></div>
+        </div>
+    </section>
+    <section class="section" id="contact">
+        <h2 class="section-title">Contact Us</h2>
+        <p class="section-subtitle">Follow us on WeChat or WhatsApp for inquiries, product selection and technical support.</p>
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h3>Get in touch</h3>
+                <div class="qr-codes">
+                    <div class="qr-item">
+                        <img src="resources/img_whatsapp_qr.jpg" alt="WhatsApp QR">
+                        <span class="qr-label">WhatsApp</span>
+                    </div>
+                    <div class="qr-item">
+                        <img src="resources/img_wechat_qr.jpg" alt="WeChat QR">
+                        <span class="qr-label">WeChat</span>
+                    </div>
+                </div>
+                <p>Follow our channels for the latest updates. Leave a message and our consultants will reply within 24 hours.</p>
+                <p>Contact Email: mars @ cuteehome.com</p>
+                <p>Services: Smart security, smart home, smart lighting, smart locks.</p>
+            </div>
+            <form class="contact-form">
+                <input type="text" placeholder="Name" required>
+                <input type="email" placeholder="Email" required>
+                <textarea placeholder="Message" required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </section>
+    <footer>
+        © 2026 CuteeHome Smart Home. All rights reserved.
+    </footer>
+</body>
+</html>
